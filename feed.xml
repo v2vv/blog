@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>海天蓝</title>
+    <link href="https://v2vv.github.io/blog/feed.xml" rel="self" />
+    <link href="https://v2vv.github.io/blog" />
+    <updated>2019-07-10T23:29:12+08:00</updated>
+    <author>
+        <name>年少</name>
+    </author>
+    <id>https://v2vv.github.io/blog</id>
+
+    <entry>
+        <title>发撒静安寺</title>
+        <author>
+            <name>年少</name>
+        </author>
+        <link href="https://v2vv.github.io/blog/fa-sa-jing-an-si.html"/>
+        <id>https://v2vv.github.io/blog/fa-sa-jing-an-si.html</id>
+
+        <updated>2019-07-10T23:08:16+08:00</updated>
+            <summary>
+                <![CDATA[
+                    就是啦房间里 
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <p>就是啦房间里</p>
+<h2 id="mcetoc_1dfe6r02f0">首付款积分</h2>
+<p> </p>
+            ]]>
+        </content>
+    </entry>
+</feed>
