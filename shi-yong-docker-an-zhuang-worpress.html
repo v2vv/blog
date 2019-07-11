@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>使用Docker安装Worpress - 海天蓝</title><meta name="generator" content="Publii Open-Source CMS for Static Site"><link rel="canonical" href="https://v2vv.github.io/blog/shi-yong-docker-an-zhuang-worpress.html"><link rel="amphtml" href="https://v2vv.github.io/blog/amp/shi-yong-docker-an-zhuang-worpress.html"><link type="application/atom+xml" rel="alternate" href="https://v2vv.github.io/blog/feed.xml"><meta property="og:title" content="使用Docker安装Worpress"><meta property="og:site_name" content="海天蓝"><meta property="og:description" content="<p><!-- wp:more --></p>
+"><meta property="og:url" content="https://v2vv.github.io/blog/shi-yong-docker-an-zhuang-worpress.html"><meta property="og:type" content="article"><link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin><link href="https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet"><style>h1,h2,h3,h4,h5,h6,.btn,[type=button],[type=submit],button,.navbar .navbar__menu li,.navbar_mobile_sidebar .navbar__menu li,.feed__author,.post__tag,.post__share>a span,.post__nav-link>span,.footer{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"}body,h1,.h1,blockquote,.search__input,.author__name,.author__info>p,.feed__item h2,.post__nav-link{font-family:'PT Serif',Georgia,"Times New Roman",Times,serif}</style><link rel="stylesheet" href="https://v2vv.github.io/blog/assets/css/style.css?v=265da1ae2f6b7c21cb85e183d075534b"><script type="application/ld+json">{"@context":"http://schema.org","@type":"Article","mainEntityOfPage":{"@type":"WebPage","@id":"https://v2vv.github.io/blog/shi-yong-docker-an-zhuang-worpress.html"},"headline":"使用Docker安装Worpress","datePublished":"2018-10-19T12:56","dateModified":"2019-07-11T18:00","description":"<p><!-- wp:more --></p>\n","author":{"@type":"Person","name":"海天蓝"},"publisher":{"@type":"Organization","name":"海天蓝"}}</script><script async src="https://v2vv.github.io/blog/assets/js/lazysizes.min.js?v=147e00ada76b65f2883e072a5f738644"></script></head><body><div class="site-container"><header class="top" id="js-header"><a class="logo" href="https://v2vv.github.io/blog/">海天蓝</a><div class="search"><div class="search__overlay js-search-overlay"><div class="search__overlay-inner"><form action="https://v2vv.github.io/blog/search.html" class="search__form"><input class="search__input js-search-input" type="search" name="q" placeholder="search..." autofocus="autofocus"></form><button class="search__close js-search-close" aria-label="Close">Close</button></div></div><button class="search__btn js-search-btn" aria-label="Search"><svg role="presentation" focusable="false"><use xlink:href="https://v2vv.github.io/blog/assets/svg/svg-map.svg#search"/></svg></button></div></header><main><article class="post"><div class="hero"><header class="hero__content"><div class="wrapper"><div class="post__meta"><time datetime="2018-10-19T12:56">十月 19, 2018</time></div><h1>使用Docker安装Worpress</h1><div class="post__meta post__meta--author"><a href="https://v2vv.github.io/blog/authors/hai-tian/" class="feed__author invert">海天蓝</a></div></div></header></div><div class="wrapper post__entry"><p></p><p></p><p></p><h2>环境搭建</h2><p></p><p></p><h4>安装Docker</h4><p></p><p></p><p>Ubuntu 14.04 16.04 (使用apt-get进行安装)，其他发行版见https://dev.aliyun.com/search.html</p><p></p><p></p><pre class="wp-block-code"><code># step 1: 安装必要的一些系统工具
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+# step 2: 安装GPG证书
+curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+# Step 3: 写入软件源信息
+sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+# Step 4: 更新并安装 Docker-CE
+sudo apt-get -y update
+sudo apt-get -y install docker-ce
+# Step 5: 配置阿里云镜像加速器，此步骤任意发行版适用
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json &lt;&lt;-'EOF'
+{
+"registry-mirrors": ["https://8svw73i7.mirror.aliyuncs.com"]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+</code></pre><p></p><p></p><h4>安装docker-compose</h4><p></p><p></p><pre class="wp-block-code"><code>#step 1: 从 https://github.com/docker/compose/releases 处下载编译好的二进制文件
+sudo curl -L https://github.com/docker/compose/releases/download/1.17.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+</code></pre><p></p><p></p><h2>开始安装</h2><p></p><p></p><pre class="wp-block-code"><code># step 1: 新建并进入wordpress目录
+mkdir wordpress
+cd wordpress
+# step 2: 新建并打开 docker-compose.yml
+vi docker-compose.yml
+# step 3: 写入以下内容（ i 键开始编辑，Esc键退出编辑，:wq 关闭且保存文件）
+version: "3"
+services:
+
+   db:
+     image: mysql:5.7
+     volumes:
+       - db_data:/var/lib/mysql
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: somewordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+volumes:
+  db_data:
+</code></pre><p></p><p></p><h4>构建并运行项目</h4><p></p><p></p><p>运行 <code>docker-compose up -d</code> Compose 就会拉取镜像再创建我们所需要的镜像，然后启动 <code>wordpress</code> 和数据库容器。 接着浏览器访问 <code>127.0.0.1:8000</code> 端口就能看到 <code>WordPress</code> 安装界面了。</p><p></p></div><footer class="wrapper post__footer"><p class="post__last-updated">This article was updated on 七月 11, 2019</p><div class="post__share"></div><div class="post__bio bio"><div class="bio__info"><h3 class="bio__name"><a href="https://v2vv.github.io/blog/authors/hai-tian/" class="invert" rel="author">海天蓝</a></h3></div></div></footer></article><nav class="post__nav"><div class="post__nav-inner"><div class="post__nav-prev"><svg width="1.041em" height="0.416em" aria-hidden="true"><use xlink:href="https://v2vv.github.io/blog/assets/svg/svg-map.svg#arrow-prev"/></svg> <a href="https://v2vv.github.io/blog/ru-he-zi-ding-yi-wordpress-de-gu-ding-lian-jie.html" class="invert post__nav-link" rel="prev"><span>Previous</span> 如何自定义WordPress的固定链接</a></div><div class="post__nav-next"><a href="https://v2vv.github.io/blog/lesslessmoonlight-shadowgreatergreater-mike-oldfield.html" class="invert post__nav-link" rel="next"><span>Next</span> 《Moonlight Shadow》- Mike Oldfield </a><svg width="1.041em" height="0.416em" aria-hidden="true"><use xlink:href="https://v2vv.github.io/blog/assets/svg/svg-map.svg#arrow-next"/></svg></div></div></nav></main><footer class="footer"><div class="footer__copyright">Powered by <a href="https://getpublii.com" target="_blank" rel="nofollow noopener">Publii Static CMS</a></div><button class="footer__bttop js-footer__bttop" aria-label="Back to top"><svg><title>Back to top</title><use xlink:href="https://v2vv.github.io/blog/assets/svg/svg-map.svg#toparrow"/></svg></button></footer></div><script>window.publiiThemeMenuConfig = {    
+        mobileMenuMode: 'sidebar',
+        animationSpeed: 300,
+        submenuWidth: 'auto',
+        doubleClickTime: 500,
+        mobileMenuExpandableSubmenus: true, 
+        relatedContainerForOverlayMenuSelector: '.top',
+   };</script><script defer="defer" src="https://v2vv.github.io/blog/assets/js/scripts.min.js?v=205f40927e4a45297a0b266e50ad78d5"></script><script>var lazyFeaturedImage=function lazyFeaturedImage(){var b=document.querySelectorAll(".hero__image-img");for(var a=0;a<b.length;a++){var c=b[a];c.addEventListener("lazyloaded",function(f){var d=f.target.parentNode;d.classList.add("hero__image--overlay")})}};lazyFeaturedImage();</script></body></html>
